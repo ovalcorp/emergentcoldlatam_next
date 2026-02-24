@@ -1,17 +1,15 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useUser } from '../../hook/useUser'
+import { useOperation } from '../../hook/useOperation'
 import { useAuth } from '../../hook/useAuth'
 import { HeaderPage } from '../../component/headerPage'
-import { AddEditUserForm } from '../../component/users/addEditForm'
 import { ModalBasic } from '../../component/common/modalBasic'
 import React from 'react'
+import { TableOperation } from '../../component/operations/tableOperation'
+import { AddEditOperationForm } from '../../component/operations/addEditForm'
 
-//compenentes users
-import { TableUser } from '../../component/users/tableUser'
-
-export default function UsersPage() {
+export default function OperationsPage() {
     // estados para el modal
     const [titleModal, setTitleModal] = useState('')
     const [showModal, setShowModal] = useState(false)
@@ -19,48 +17,48 @@ export default function UsersPage() {
     const [refresh, setRefresh] = useState(false)
 
     //estados para el listado de usuarios
-    const { users, loading, error, getUsers, deleteUser } = useUser()
+    const { operations, loading, error, getOperations, deleteOperation } = useOperation()
     const { isAuthenticated, user } = useAuth()
-    const showNewButton = user?.is_superuser || false
+    const showNewButton = user?.is_staff || false
 
     useEffect(() => {
-        getUsers()
+        getOperations()
     }, [refresh])
 
     const openCloseModal = () => setShowModal(false)
     const onRefresh = () => setRefresh((prev) => !prev)
 
-    const addUser = () => {
-        setTitleModal('Crear Usuario')
-        setContentModal(<AddEditUserForm onClose={openCloseModal} onRefresh={onRefresh}/>)
+    const addOperation = () => {
+        setTitleModal('Crear Operación')
+        setContentModal(<AddEditOperationForm onClose={openCloseModal} onRefresh={onRefresh}/>)
         setShowModal(true)
     }
 
 
-    const updateUser = (user: any) => {
-        setTitleModal('Actualizar Usuario')
-        setContentModal(<AddEditUserForm onClose={openCloseModal} onRefresh={onRefresh} user={user}/>)
+    const updateOperation = (operation: any) => {
+        setTitleModal('Actualizar Operación')
+        setContentModal(<AddEditOperationForm onClose={openCloseModal} onRefresh={onRefresh} operation={operation}/>)
         setShowModal(true)
     }
 
-    const handleDeleteUser = async (id: number) => {
+    const handleDeleteOperation = async (id: number) => {
       try {
-        await deleteUser(id)
+        await deleteOperation(id)
         onRefresh()
       } catch (error) {
-        console.error('Error al eliminar usuario:', error)
+        console.error('Error al eliminar operación:', error)
       }
     }
 
-    const onDeleteUser = (user: any) => {
-        setTitleModal('Eliminar Usuario')
+    const onDeleteOperation = (operation: any) => {
+        setTitleModal('Eliminar Operación')
         setContentModal(
           <div className="space-y-4">
             <p className="text-sm text-gray-600">Esta acción no se puede deshacer.</p>
             <button 
               className="bg-red-500 text-white px-4 py-2 rounded-md" 
               onClick={() => {
-                handleDeleteUser(user.id)
+                handleDeleteOperation(operation.id)
                 openCloseModal()
               }}
             >
@@ -93,17 +91,17 @@ export default function UsersPage() {
   return (
     <div className="w-full space-y-4">
         <HeaderPage 
-          title="Usuarios" 
+          title="Operaciones" 
           onSearch={() => {}} 
-          onNew={addUser} 
+          onNew={addOperation} 
           onSync={onRefresh}
           showNewButton={showNewButton}
         />
         <div className="w-full">
-          <TableUser
-            users={users}
-            updateUser={updateUser}
-            onDeleteUser={onDeleteUser}
+          <TableOperation
+            operations={operations}
+            updateOperation={updateOperation}
+            onDeleteOperation={onDeleteOperation}
           />
         </div>
         

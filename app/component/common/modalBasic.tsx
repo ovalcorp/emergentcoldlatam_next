@@ -1,77 +1,80 @@
-'use client'
+'use client';
 
-import { createPortal } from 'react-dom'
-import { useEffect } from 'react'
+import {
+  Dialog,
+  DialogBackdrop,
+  DialogPanel,
+  DialogTitle,
+} from '@headlessui/react';
 
 interface ModalBasicProps {
-  show: boolean
-  onClose: () => void
-  title?: string
-  children?: React.ReactNode
+  show: boolean;
+  onClose: () => void;
+  title: string;
+  children: React.ReactNode;
 }
 
-export function ModalBasic({ show, onClose, title, children }: ModalBasicProps) {
-  useEffect(() => {
-    if (show) {
-      document.body.style.overflow = 'hidden'
-      const main = document.querySelector('main')
-      if (main) (main as HTMLElement).style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = ''
-      const main = document.querySelector('main')
-      if (main) (main as HTMLElement).style.overflow = ''
-    }
-    return () => {
-      document.body.style.overflow = ''
-      const main = document.querySelector('main')
-      if (main) (main as HTMLElement).style.overflow = ''
-    }
-  }, [show])
-
-  useEffect(() => {
-    if (!show) return
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
-    document.addEventListener('keydown', handleEscape)
-    return () => document.removeEventListener('keydown', handleEscape)
-  }, [show, onClose])
-
-  if (!show) return null
-
-  const modalContent = (
-    <div
-      className="fixed inset-0 z-[99999] flex items-center justify-center p-4"
-      style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
+export function ModalBasic({
+  show,
+  onClose,
+  title,
+  children,
+}: ModalBasicProps) {
+  return (
+    <Dialog
+      open={show}
+      onClose={onClose}
+      className="relative z-50"
     >
-      <div
-        className="absolute inset-0 bg-black/50"
-        onClick={onClose}
-        aria-hidden
+      {/* Backdrop */}
+      <DialogBackdrop
+        transition
+        className="
+          fixed inset-0 bg-black/40
+          duration-300 ease-out
+          data-closed:opacity-0
+        "
       />
-      <div
-        className="relative z-10 w-full max-w-lg rounded-lg bg-white p-6 shadow-2xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {title && (
-          <h2 className="mb-4 text-lg font-semibold">
-            {title}
-          </h2>
-        )}
-        {children}
-        <div className="mt-6 flex justify-end">
-          <button
-            onClick={onClose}
-            className="rounded-md bg-black px-4 py-2 text-white hover:bg-gray-800"
+
+      {/* Contenedor centrado scrollable */}
+      <div className="fixed inset-0 w-screen overflow-y-auto p-4">
+        <div className="flex min-h-full items-center justify-center">
+          
+          {/* Panel */}
+          <DialogPanel
+            transition
+            className="
+              relative w-full max-w-md rounded-xl bg-white p-6 shadow-xl
+              duration-300 ease-out
+              data-closed:scale-95
+              data-closed:opacity-0
+            "
           >
-            Cerrar
-          </button>
+            {/* Botón X arriba a la derecha */}
+            <button
+              type="button"
+              onClick={onClose}
+              className="
+                absolute right-3 top-3
+                text-gray-400 hover:text-gray-600
+                focus:outline-none
+              "
+            >
+              ✕
+            </button>
+
+            <DialogTitle className="text-lg font-semibold text-gray-900">
+              {title}
+            </DialogTitle>
+
+            <div className="mt-4 text-gray-600">
+              {children}
+            </div>
+          </DialogPanel>
+
         </div>
       </div>
-    </div>
-  )
-
-  if (typeof document === 'undefined') return null
-
-  return createPortal(modalContent, document.body)
+    </Dialog>
+  );
 }
+

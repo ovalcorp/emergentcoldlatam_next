@@ -8,7 +8,7 @@ interface Params {
 export async function GET(_: Request, { params }: Params) {
   const { id } = await params
 
-  const result = await fetchWithAuth(`/api/users/${id}/`)
+  const result = await fetchWithAuth(`/api/operations/${id}/`)
   return result.response
 }
 
@@ -17,7 +17,7 @@ export async function PUT(req: Request, { params }: Params) {
   const { id } = await params
   const body = await req.json()
 
-  const result = await fetchWithAuth(`/api/users/${id}/`, {
+  const result = await fetchWithAuth(`/api/operations/${id}/`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
@@ -31,11 +31,7 @@ export async function PATCH(req: Request, { params }: Params) {
   const { id } = await params
   const body = await req.json()
 
-  if (!body.password) {
-    delete body.password
-  }
-
-  const result = await fetchWithAuth(`/api/users/${id}/`, {
+  const result = await fetchWithAuth(`/api/operations/${id}/`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
@@ -48,7 +44,7 @@ export async function PATCH(req: Request, { params }: Params) {
 export async function DELETE(_: Request, { params }: Params) {
   const { id } = await params
 
-  const result = await fetchWithAuth(`/api/users/${id}/`, {
+  const result = await fetchWithAuth(`/api/operations/${id}/`, {
     method: 'DELETE',
   })
 

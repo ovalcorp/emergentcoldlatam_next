@@ -1,7 +1,6 @@
 'use client';
 
 import { BRAND_COLOR } from '../globals';
-import { Button } from '@headlessui/react';
 
 const REPORT_DATA = {
   recepciones: { atendidas: 142, pendientes: 14 },
@@ -30,13 +29,6 @@ function Bar({ label, value, max, color }: { label: string; value: number; max: 
 export default function Dashboard() {
   return (
     <div className="space-y-6">
-      <Button className="bg-red-600 text-white p-4">
-  Botón prueba
-</Button>
-<button className="bg-red-600 text-white p-4">
-  Botón prueba
-</button>
-<p className="text-red-600">hola gente color roja</p>
 
       <div className="grid gap-4 sm:grid-cols-4">
         <div className="rounded-lg border border-slate-200 bg-white p-4">
