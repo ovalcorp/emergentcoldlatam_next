@@ -21,9 +21,15 @@ export function AddEditOperationForm({ onClose, onRefresh, operation }: any) {
     validationSchema: operation ? updateValidationSchema() : newValidationSchema(),
     onSubmit: async (formValue) => {
       try {
+        const payload = emptyStringToNull(formValue, [
+          'pre_chamber_entry_time',
+          'pre_chamber_exit_time',
+          'yard_exit_time',
+          'set_temperature',
+        ])
         operation
-          ? await updateOperation(operation.id, formValue)
-          : await createOperation(formValue)
+          ? await updateOperation(operation.id, payload)
+          : await createOperation(payload)
 
         toast.success(operation ? 'Operación actualizada correctamente' : 'Operación creada correctamente')
         onRefresh()
@@ -291,6 +297,18 @@ export function AddEditOperationForm({ onClose, onRefresh, operation }: any) {
       </form>
     </div>
   )
+}
+
+/** Convierte "" en null para los campos indicados (el backend espera null, no string vacío) */
+function emptyStringToNull<T extends Record<string, unknown>>(
+  payload: T,
+  keys: (keyof T)[]
+): T {
+  const out: Record<string, unknown> = { ...payload }
+  for (const key of keys) {
+    if (out[key as string] === '') out[key as string] = null
+  }
+  return out as T
 }
 
 function initialValues(data: any) {
