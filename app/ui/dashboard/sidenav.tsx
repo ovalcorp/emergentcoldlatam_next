@@ -13,7 +13,7 @@ export default function SideNav() {
       className="text-white h-full flex flex-col transition-colors"
       style={{ backgroundColor: BRAND_COLOR_LIGHT }}
     >
-      <div className="p-4">
+      <div className="p-4 overflow-y-auto flex-1">
         <ul className="space-y-2">
           <NavLinks />
         </ul>

@@ -16,13 +16,13 @@ export async function GET(request: Request) {
 
   const qs = params.toString() ? `?${params.toString()}` : ''
 
-  const result = await fetchWithAuth(`/api/users/${qs}`);
+  const result = await fetchWithAuth(`/api/sites/${qs}`);
   return result.response;
 }
 
 export async function POST(request: Request) {
   const body = await request.json();
-  const result = await fetchWithAuth('/api/users/', {
+  const result = await fetchWithAuth('/api/sites/', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),

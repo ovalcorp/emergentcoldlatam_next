@@ -5,6 +5,7 @@ import {
   DialogBackdrop,
   DialogPanel,
   DialogTitle,
+  Button,
 } from '@headlessui/react';
 
 interface ModalBasicProps {
@@ -51,7 +52,7 @@ export function ModalBasic({
             "
           >
             {/* Botón X arriba a la derecha */}
-            <button
+            <Button
               type="button"
               onClick={onClose}
               className="
@@ -61,7 +62,7 @@ export function ModalBasic({
               "
             >
               ✕
-            </button>
+            </Button>
 
             <DialogTitle className="text-lg font-semibold text-gray-900">
               {title}

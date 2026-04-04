@@ -6,7 +6,7 @@ const protectedRoutes = ["/dashboard"]
 // Rutas públicas
 const publicRoutes = ["/login", "/"]
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl
 
   // ¿La ruta empieza con /dashboard?

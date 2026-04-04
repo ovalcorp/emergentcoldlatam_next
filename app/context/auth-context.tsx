@@ -14,9 +14,17 @@ export interface User {
     identification_number: string;
     position: string;
     area: string;
+    area_name: string
     department: string;
+    department_name: string
     country: string;
+    country_name: string
     site: string;
+    site_name: string
+    metadata: number[]
+    metadata_names: { id: number; name: string }[]
+    permissions_sites: number[]
+    permissions_sites_names: { id: number; name: string }[]
 }
 
 export interface AuthContextType {

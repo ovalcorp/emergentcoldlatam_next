@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { AuthContext, User } from "./auth-context";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -14,7 +14,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(false);
 
   const router = useRouter();
-  const pathname = usePathname();
 
   // 🔁 Obtener usuario actual
   const refreshUser = useCallback(async () => {
@@ -80,14 +79,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       await refreshUser();
-
-      if (!pathname?.startsWith("/dashboard")) {
-        router.push("/dashboard");
-      }
-
+      router.push("/dashboard");
       setLoading(false);
     },
-    [refreshUser, router, pathname]
+    [refreshUser, router]
   );
 
   // 🚪 Logout
@@ -100,13 +95,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     setUser(null);
-
-    if (pathname !== "/login") {
-      router.push("/login");
-    }
-
+    router.push("/login");
     setLoading(false);
-  }, [router, pathname]);
+  }, [router]);
 
   const value = useMemo(
     () => ({
