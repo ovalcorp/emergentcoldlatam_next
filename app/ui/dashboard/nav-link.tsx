@@ -108,7 +108,7 @@ const NAV_PERMISSIONS: Record<string, string[]> = {
   'Gestión Humana':      ['super_user', 'gestion_humana'],
   'IT':                  ['super_user', 'it'],
   'Mantenimiento':       ['super_user', 'mantenimiento'],
-  'WMS':                 ['super_user', 'operaciones', 'mesa_operaciones'],
+  'WMS':                 ['super_user', 'operaciones', 'mesa_operaciones', 'wms'],
   'Mantenedor':          ['super_user', 'it'],
   'Especiales':          ['super_user', 'especial'],
 }

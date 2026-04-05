@@ -1,32 +1,41 @@
-# Emergent Cold Latam - Frontend
+# Emergent Cold Latam — Frontend
 
-Frontend Next.js para **Emergent Cold Latam**, el mayor proveedor de soluciones de logística con cadena de frío en Latinoamérica (Perú, Ecuador, Chile).
+Aplicación web **Next.js** para **Emergent Cold Latam**: logística y cadena de frío en Latinoamérica (Perú, Ecuador, Chile). Este cliente consume la API REST del backend **EmergentColdLatam_django** mediante rutas BFF en `app/api` (cookies HTTP-only, JWT y refresh).
+
+---
 
 ## Stack
 
-- **Next.js 16** (App Router)
-- **React 19**
-- **Tailwind CSS v4**
-- **Headless UI**, Formik, Yup, React Toastify
+| Tecnología | Uso |
+|------------|-----|
+| **Next.js 16** | App Router, Route Handlers (`app/api`) |
+| **React 19** | UI |
+| **TypeScript 5** | Tipado |
+| **Tailwind CSS v4** | Estilos (`@tailwindcss/postcss`) |
+| **Headless UI** | Componentes accesibles (Fieldset, etc.) |
+| **Formik + Yup** | Formularios y validación |
+| **React Toastify** | Notificaciones |
+| **date-fns** / **moment** | Fechas |
+| **react-big-calendar** | Calendario (Mesa de operaciones) |
+
+---
 
 ## Requisitos
 
-- Node.js 18+
-- npm, yarn, pnpm o bun
+- **Node.js 18+** (recomendado 20 LTS)
+- **npm**, yarn, pnpm o bun
+- Backend Django en ejecución (ver variable de entorno)
+
+---
 
 ## Instalación
 
 ```bash
+cd emergentcoldlatam_next
 npm install
-# o
-yarn install
-# o
-pnpm install
 ```
 
-## Variables de entorno
-
-Copia el archivo de ejemplo y configura tus valores:
+### Variables de entorno
 
 ```bash
 cp .env.example .env.local
@@ -34,43 +43,118 @@ cp .env.example .env.local
 
 | Variable | Descripción |
 |----------|-------------|
-| `NEXT_PUBLIC_API_URL` | URL del backend Django (ej: `http://127.0.0.1:8000`) |
+| `NEXT_PUBLIC_API_URL` | URL base del backend Django **sin** barra final (ej. `http://127.0.0.1:8000`). Usada por `app/lib/api-client.ts` y `app/lib/utils.ts` (`BASE_API_URL`). |
 
-## Desarrollo
+> El archivo `.env.example` incluye un valor de ejemplo para desarrollo local.
+
+---
+
+## Desarrollo y producción
 
 ```bash
-npm run dev
+npm run dev      # http://localhost:3000
+npm run build    # Build de producción
+npm run start    # Servidor tras build
+npm run lint     # ESLint (eslint-config-next)
 ```
 
-Abre [http://localhost:3000](http://localhost:3000). La app se conecta al backend en la URL configurada en `NEXT_PUBLIC_API_URL`.
+Asegúrate de que el backend responda en `NEXT_PUBLIC_API_URL` y que CORS/cookies estén alineados con tu entorno.
 
-## Scripts
+---
 
-| Comando | Descripción |
-|---------|-------------|
-| `npm run dev` | Servidor de desarrollo |
-| `npm run build` | Build de producción |
-| `npm run start` | Servidor de producción |
-| `npm run lint` | Ejecutar ESLint |
+## Arquitectura resumida
 
-## Estructura principal
+1. **Login** (`/login`): credenciales → `POST /api/auth/login` → cookies de sesión (access/refresh).
+2. **Rutas `app/api/*`**: proxy seguro hacia Django (`fetchWithAuth` en `app/lib/api-client.ts`), reenvío de JWT desde cookies y **refresh** automático en 401.
+3. **Cliente (hooks / componentes)**: `fetch` a **`/api/...`** del mismo origen Next (`credentials: 'include'`), no llama al dominio de Django desde el navegador.
+4. **`next.config.ts`**: `rewrites` opcionales hacia el backend; las **Route Handlers** definidas en `app/api` tienen prioridad cuando existen.
+
+---
+
+## Estructura del proyecto
 
 ```
-app/
-├── api/              # Rutas API (auth proxy)
-├── component/        # Componentes reutilizables
-├── context/          # AuthProvider
-├── dashboard/        # Páginas del dashboard
-├── hook/             # useUser, useAuth
-├── lib/              # api-client, utils, auth-cookies
-├── login/
-└── ui/               # UI del dashboard (header, sidenav)
+emergentcoldlatam_next/
+├── app/
+│   ├── api/                    # BFF → Django (auth + recursos)
+│   │   ├── auth/               # login, logout, refresh, me
+│   │   ├── countries/          # CRUD países
+│   │   ├── sites/              # CRUD sites (+ filtros/paginación)
+│   │   ├── users/              # usuarios
+│   │   ├── operations/         # operaciones
+│   │   ├── departments/        # departamentos (master data)
+│   │   ├── areas/              # áreas (?department=…)
+│   │   ├── metadata/           # metadata
+│   │   └── guia-carnica/       # consulta guía cárnica (WMS)
+│   ├── component/              # Formularios, tablas, modal, etc.
+│   │   ├── administration/     # users, sites, countries
+│   │   ├── common/form/
+│   │   └── operations/
+│   ├── context/                # AuthProvider, auth-context
+│   ├── dashboard/              # Layout + páginas del panel
+│   ├── hook/                   # useAuth, useUser, useCountry, useSite,
+│   │                           # useDepartment, useArea, useMetadata,
+│   │                           # useOperation, useGuiaCarnica, …
+│   ├── lib/                    # api-client, auth-cookies, utils
+│   ├── login/
+│   ├── services/               # crudService (GET/POST/PATCH/DELETE genéricos)
+│   ├── ui/                     # login-form, dashboard header/sidenav
+│   ├── utils/                  # handleRequest, extractErrorMessage
+│   ├── layout.tsx, page.tsx, globals.css
+│   └── globals.ts              # colores de marca (BRAND, SECONDARY, …)
+├── proxy.ts                    # utilidades de proxy (si aplica)
+├── next.config.ts
+├── package.json
+└── react-big-calendar.d.ts     # tipos locales
 ```
+
+---
+
+## Dashboard y permisos
+
+El menú lateral (`app/ui/dashboard/nav-link.tsx`) agrupa **Administración**, **Mesa de Operaciones**, **Operaciones**, **Calidad**, **Gestión Humana**, **IT**, **Mantenimiento**, **WMS**, **Mantenedor**, **Especiales**, etc.
+
+El **acceso por sección** se controla con los **metadata** del usuario (`metadata_names` en el perfil): cada ítem del menú exige que el usuario tenga al menos uno de los permisos configurados en `NAV_PERMISSIONS` (además de autenticación, usuario activo y, salvo el Dashboard, `is_staff`).
+
+### Páginas implementadas (ejemplos)
+
+- **Dashboard** — `/dashboard`
+- **Administración** — usuarios, países, sites (`/dashboard/administration/...`)
+- **Mesa de operaciones** — mesa, calendario, indicadores
+- **WMS** — recepción y despacho (guía cárnica) — `/dashboard/wms/reception`, `/dashboard/wms/dispatch`
+
+Otras entradas del menú pueden apuntar a rutas aún en desarrollo; conviene alinear `href` en `nav-link.tsx` con carpetas reales bajo `app/dashboard/`.
+
+---
+
+## Hooks y datos
+
+- **`useAuth`**: contexto de sesión y usuario.
+- **CRUD maestros**: `useCountry`, `useSite`, `useDepartment`, `useArea` (filtro por departamento), `useMetadata`, `useUser`, `useOperation`.
+- **`useGuiaCarnica`**: consulta POST a guía cárnica vía `/api/guia-carnica`.
+- **`crudService`**: `getAll`, `createOne`, `updateOne`, `deleteOne` sobre `/api/{endpoint}`.
+
+---
 
 ## Backend
 
-Este frontend consume la API REST del proyecto **EmergentColdLatam_django**. Asegúrate de tener el backend corriendo en la URL configurada en `NEXT_PUBLIC_API_URL`.
+Repositorio relacionado: **EmergentColdLatam_django**. Este frontend asume:
 
-## Deploy
+- API bajo `/api/...` en el mismo host configurado en `NEXT_PUBLIC_API_URL`.
+- Autenticación JWT coherente con las rutas `app/api/auth/*`.
 
-Compatible con [Vercel](https://vercel.com). Configura `NEXT_PUBLIC_API_URL` con la URL de tu API en producción.
+---
+
+## Despliegue
+
+Compatible con plataformas como **Vercel** u otros hosts Node.js:
+
+1. Definir `NEXT_PUBLIC_API_URL` con la URL pública del API en producción.
+2. Configurar cookies seguras (`Secure`, dominio, SameSite) según tu dominio front/back.
+3. `npm run build` y `npm run start` (o el comando del proveedor).
+
+---
+
+## Licencia / empresa
+
+Uso interno **Emergent Cold Latam**. Ajusta licencia y contacto según políticas de tu organización.
