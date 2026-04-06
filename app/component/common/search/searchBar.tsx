@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Button } from '@headlessui/react'
 
-import { SearchIcon } from '../icon/icon'
+import { SearchIcon } from '../icon/edit-icon'
 
 interface SearchBarProps {
   onSearch: (value: string) => void

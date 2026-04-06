@@ -2,7 +2,7 @@
 
 import { useAuth } from '../../../hook/useAuth'
 import { cardColor, SECONDARY_COLOR } from '../../../globals'
-import { EditIcon, TrashIcon } from '../../common/icon/icon'
+import { EditIcon, TrashIcon } from '../../common/icon/edit-icon'
 import { TableSkeleton } from '../../../ui/skeletons/table-skeletons'
 import { ErrorMessage } from '../../common/errorMessage'
 import { Site } from '../../../hook/useSite'

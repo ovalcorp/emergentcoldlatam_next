@@ -92,7 +92,7 @@ export default function OperationsPage() {
     <div className="w-full space-y-4">
         <HeaderPage 
           title="Operaciones" 
-          onSearch={() => {}} 
+          //onSearch={() => {}} 
           onNew={addOperation} 
           onSync={onRefresh}
           showNewButton={showNewButton}
